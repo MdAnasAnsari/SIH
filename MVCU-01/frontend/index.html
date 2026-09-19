@@ -21,7 +21,11 @@
     <div class="stat">WI-FI<b id="wifiStatus" class="online">OFFLINE</b></div>
     <div class="stat">CONTROLLER<b id="controllerStatus">OFFLINE</b></div>
     <div class="stat">CAMERA<b id="cameraStatus">OFFLINE</b></div>
-    <div class="mode"><button class="active">MANUAL</button><button>AUTO</button><button>ASSIST</button></div>
+   <div class="mode" id="driveMode">
+  <button class="active" data-mode="MANUAL">MANUAL</button>
+  <button data-mode="AUTO">AUTO</button>
+  <button data-mode="ASSIST">ASSIST</button>
+</div>
     <div class="stat">SYSTEM<b id="systemStatus" class="online">STANDBY</b></div>
   </div>
 </header>
