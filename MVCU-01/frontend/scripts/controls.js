@@ -11,7 +11,6 @@ export function updateDrive() {
   $('mobBrake').className = state.brake ? 'red' : 'green';
   $('mobMotor').className = state.vehicleOn && !state.brake ? 'green' : 'muted';
 }
-
 function setDirection(direction) {
 
   if (state.mode === 'AUTO') {
@@ -41,59 +40,15 @@ function setDirection(direction) {
 
   updateDrive();
 
-  sendCommand('DIR:' + direction);
-}
-
-  if (state.mode === 'AUTO') {
-    log(
-      'Manual movement blocked: vehicle is in AUTO mode',
-      'warn'
-    );
-    return;
+  if (direction === 'forward') {
+    sendCommand('MOTOR:FORWARD');
   }
-
-  if (!state.vehicleOn) {
-    log('START required before direction command', 'warn');
-    return;
+  else if (direction === 'reverse') {
+    sendCommand('MOTOR:BACKWARD');
   }
-
-  if (state.brake) {
-    log('Movement blocked: BRAKE is active', 'warn');
-    return;
+  else {
+    sendCommand('MOTOR:OFF');
   }
-
-  state.direction = direction;
-
-  state.speed =
-    direction === 'STOP'
-      ? 0
-      : Math.max(0.5, state.pwm * 0.18);
-
-  updateDrive();
-
-  sendCommand('DIR:' + direction);
-}
-
-  if (!state.vehicleOn) {
-    log('START required before direction command', 'warn');
-    return;
-  }
-
-  if (state.brake) {
-    log('Movement blocked: BRAKE is active', 'warn');
-    return;
-  }
-
-  state.direction = direction;
-
-  state.speed =
-    direction === 'STOP'
-      ? 0
-      : Math.max(0.5, state.pwm * 0.18);
-
-  updateDrive();
-
-  sendCommand('DIR:' + direction);
 }
 
 function brakeOn() {
@@ -174,8 +129,46 @@ export function bindControls() {
   log('Vehicle STOPPED');
 };
   document.querySelectorAll('[data-dir]').forEach(button => {
-    button.onpointerdown = () => setDirection(button.dataset.dir);
-  });
+
+  button.onpointerdown = () => {
+
+    const direction = button.dataset.dir;
+
+    if (direction === 'left') {
+
+      if (!state.vehicleOn || state.brake) {
+        log('START and release brake before steering', 'warn');
+        return;
+      }
+
+      state.direction = 'LEFT';
+      updateDrive();
+
+      sendCommand('SERVO:30');
+    }
+
+    else if (direction === 'right') {
+
+      if (!state.vehicleOn || state.brake) {
+        log('START and release brake before steering', 'warn');
+        return;
+      }
+
+      state.direction = 'RIGHT';
+      updateDrive();
+
+      sendCommand('SERVO:90');
+    }
+
+    else if (direction === 'forward') {
+      setDirection('forward');
+    }
+
+    else if (direction === 'reverse') {
+      setDirection('reverse');
+    }
+  };
+});
   $('btnBrake').onpointerdown = brakeOn;
   $('btnBrake').onpointerup = brakeOff;
   $('btnBrake').onpointerleave = brakeOff;
@@ -198,7 +191,8 @@ $('btnEmergency').onclick = async () => {
   await sendCommand('PWM:0');
   await sendCommand('SERVO:60');
   await sendCommand('BRAKE:ON');
-  await sendCommand('EMERGENCY:STOP');
+  // ESP32 has no EMERGENCY:STOP command.
+// Emergency stop is implemented using the supported commands.
 
   log('EMERGENCY STOP ACTIVATED — VEHICLE FULLY STOPPED', 'err');
   setText('systemStatus', 'EMERGENCY');
