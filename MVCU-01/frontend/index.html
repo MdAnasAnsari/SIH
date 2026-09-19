@@ -44,6 +44,26 @@
     <div class="safetyRow"><button class="btn brake" id="btnBrake">⛔ BRAKE<br><small>HOLD TO STOP</small></button><button class="btn emergency" id="btnEmergency">⚠ EMERGENCY<br>STOP</button></div>
     <div class="panelTitle" style="margin-top:18px"><span>LIGHTS</span></div>
     <div class="headlights" id="headlights"><button class="btn active" data-head="off">○ OFF</button><button class="btn" data-head="low">◉ LOW</button><button class="btn" data-head="high">◉ HIGH</button></div>
+  <div class="odometerCard" id="odometerCard">
+
+  <div class="odoIcon">
+    ⛏
+  </div>
+
+  <div class="odoInfo">
+    <label>ODOMETER · TOTAL DISTANCE</label>
+
+    <div>
+      <strong id="odometer">0.00</strong>
+      <span>km</span>
+    </div>
+  </div>
+
+  <button id="resetOdometer" class="odoReset">
+    ↻ RESET
+  </button>
+
+</div>
   </section>
 
   <section class="panel camera">
@@ -77,7 +97,87 @@
       <div class="metric"><label>BATTERY</label><strong id="battery" class="green">92</strong><small>%</small></div>
       <div class="metric"><label>MOTOR TEMP</label><strong id="motorTemp">32</strong><small> °C</small></div>
       <div class="metric"><label>CONTROLLER TEMP</label><strong id="controllerTemp">30</strong><small> °C</small></div>
-      <div class="metric laser"><label>📡 LASER DISTANCE SENSOR · FRONT OBSTACLE</label><div class="laserValue"><strong id="laserDistance">2.36</strong><small>meters</small></div><div class="bar"><i id="laserBar"></i></div><div class="safeStatus" id="laserStatus">● SAFE · CLEAR PATH</div></div>
+     <div class="distanceTracker">
+
+  <div class="trackerHeader">
+    <div>
+      <span class="trackerIcon">◉</span>
+      <strong>OBSTACLE DISTANCE TRACKER</strong>
+      <small>VL53L0X</small>
+    </div>
+
+    <span class="trackerLive">● LIVE</span>
+  </div>
+
+  <div class="distanceBody">
+
+    <div class="distanceScale">
+
+      <div class="distanceLine critical">
+        <i></i>
+        <span>&lt; 0.5 m</span>
+        <b>CRITICAL</b>
+      </div>
+
+      <div class="distanceLine warning">
+        <i></i>
+        <span>0.5 – 1.0 m</span>
+        <b>WARNING</b>
+      </div>
+
+      <div class="distanceLine safe">
+        <i></i>
+        <span>&gt; 1.0 m</span>
+        <b>SAFE</b>
+      </div>
+
+    </div>
+
+    <div class="distanceVisual">
+
+      <div class="distanceRadar">
+        <div class="radarArc arc1"></div>
+        <div class="radarArc arc2"></div>
+        <div class="radarArc arc3"></div>
+        <div class="radarVehicle">▣</div>
+      </div>
+
+      <div class="distanceReadout">
+        <small>CURRENT DISTANCE</small>
+
+        <div>
+          <strong id="laserDistance">--</strong>
+          <span>m</span>
+        </div>
+
+        <b id="laserStatus" class="distanceState safeState">
+          ● SAFE · CLEAR PATH
+        </b>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="distanceStats">
+    <div>
+      <small>MIN DISTANCE</small>
+      <b id="laserMin">-- m</b>
+    </div>
+
+    <div>
+      <small>AVG DISTANCE</small>
+      <b id="laserAvg">-- m</b>
+    </div>
+
+    <div>
+      <small>MAX DISTANCE</small>
+      <b id="laserMax">-- m</b>
+    </div>
+
+  </div>
+
+</div>
     </div>
   </section>
 </main>
