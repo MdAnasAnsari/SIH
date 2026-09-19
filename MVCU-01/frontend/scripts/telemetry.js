@@ -44,11 +44,43 @@ function updateDemoTelemetry() {
   setText('fleetDistance', (126.8 + state.tripKm).toFixed(1));
 }
 
-function updateDemoLaser() {
-  if (state.vehicleOn && state.direction !== 'STOP' && !state.brake) {
-    state.laser += (Math.random() - .5) * .18;
-    state.laser = Math.max(.25, Math.min(4.0, state.laser));
+function updateLaserDisplay() {
+  const distance = Number(state.laser);
+
+  if (!Number.isFinite(distance) || distance < 0) {
+    setText('laserDistance', '--');
+    $('laserBar').style.width = '0%';
+    setText('laserStatus', '● SENSOR ERROR');
+    setText('mobLaser', 'ERROR');
+    $('mobLaser').className = 'red';
+    return;
   }
+
+  const meters = distance > 20 ? distance / 1000 : distance;
+
+  setText('laserDistance', meters.toFixed(2));
+
+  const percentage = Math.max(
+    4,
+    Math.min(100, (meters / 4) * 100)
+  );
+
+  $('laserBar').style.width = percentage + '%';
+
+  if (meters < 0.5) {
+    setText('laserStatus', '● CRITICAL · OBSTACLE VERY CLOSE');
+    setText('mobLaser', 'CRITICAL');
+    $('mobLaser').className = 'red';
+  } else if (meters < 1.0) {
+    setText('laserStatus', '● WARNING · REDUCE SPEED');
+    setText('mobLaser', 'WARNING');
+    $('mobLaser').className = 'yellow';
+  } else {
+    setText('laserStatus', '● SAFE · CLEAR PATH');
+    setText('mobLaser', 'SAFE');
+    $('mobLaser').className = 'green';
+  }
+}
   setText('laserDistance', state.laser.toFixed(2));
   const percentage = Math.max(4, Math.min(100, state.laser / 4 * 100));
   $('laserBar').style.width = percentage + '%';
@@ -78,13 +110,15 @@ async function pollTelemetry() {
     if (data.az != null) setText('imuAz', Number(data.az).toFixed(2));
     if (data.roll != null) setText('imuRoll', Number(data.roll).toFixed(1) + '°');
     if (data.pitch != null) setText('imuPitch', Number(data.pitch).toFixed(1) + '°');
-  } catch {
-    // Keep demo values running if the ESP32 telemetry endpoint is not implemented.
+    } catch (error) {
+    setText('mobLink', 'OFFLINE');
+    $('mobLink').className = 'red';
+
+    console.warn('ESP32 telemetry unavailable:', error.message);
   }
-}
 
 export function startTelemetry() {
   setInterval(updateDemoTelemetry, 500);
-  setInterval(updateDemoLaser, 700);
+  setInterval(updateLaserDisplay, 200);
   setInterval(pollTelemetry, 1000);
 }
