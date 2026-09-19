@@ -218,11 +218,19 @@ $('btnEmergency').onclick = async () => {
     log('Gear changed → G' + state.gear);
   });
   document.querySelector('[data-gear="1"]').classList.add('active');
-  document.querySelectorAll('[data-head]').forEach(button => button.onclick = () => {
-    document.querySelectorAll('[data-head]').forEach(item => item.classList.toggle('active', item === button));
-    sendCommand('HEAD:' + button.dataset.head);
-    log('Headlight → ' + button.dataset.head.toUpperCase());
-  });
+document.querySelectorAll('[data-head]').forEach(button => button.onclick = () => {
+  document.querySelectorAll('[data-head]').forEach(item =>
+    item.classList.toggle('active', item === button)
+  );
+
+  const headCommand = button.dataset.head === 'off'
+    ? 'HEAD:OFF'
+    : 'HEAD:ON';
+
+  sendCommand(headCommand);
+
+  log('Headlight → ' + button.dataset.head.toUpperCase());
+});
   $('btnConnect').onclick = connectEsp32;
   $('btnDisconnect').onclick = disconnectEsp32;
   $('clearLog').onclick = () => {
