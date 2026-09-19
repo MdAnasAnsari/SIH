@@ -13,13 +13,56 @@ export function updateDrive() {
 }
 
 function setDirection(direction) {
+
+  if (state.mode === 'AUTO') {
+    log(
+      'Manual movement blocked: vehicle is in AUTO mode',
+      'warn'
+    );
+    return;
+  }
+
   if (!state.vehicleOn) {
     log('START required before direction command', 'warn');
     return;
   }
+
+  if (state.brake) {
+    log('Movement blocked: BRAKE is active', 'warn');
+    return;
+  }
+
   state.direction = direction;
-  state.speed = direction === 'STOP' ? 0 : Math.max(0.5, state.pwm * .18);
+
+  state.speed =
+    direction === 'STOP'
+      ? 0
+      : Math.max(0.5, state.pwm * 0.18);
+
   updateDrive();
+
+  sendCommand('DIR:' + direction);
+}
+
+  if (!state.vehicleOn) {
+    log('START required before direction command', 'warn');
+    return;
+  }
+
+  if (state.brake) {
+    log('Movement blocked: BRAKE is active', 'warn');
+    return;
+  }
+
+  state.direction = direction;
+
+  state.speed =
+    direction === 'STOP'
+      ? 0
+      : Math.max(0.5, state.pwm * 0.18);
+
+  updateDrive();
+
   sendCommand('DIR:' + direction);
 }
 
