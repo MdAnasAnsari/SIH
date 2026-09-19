@@ -37,3 +37,285 @@
 .kpiStrip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
 .kpi{padding:12px;border:1px solid var(--line);border-radius:10px;background:#081a2b}
 .kpi label{display:block;color:var(--muted);font-size:9px}.kpi strong{display:block;font:700 21px var(--mono);margin-top:5px}.kpi small{color:var(--muted);font-size:9px}
+.distanceTracker {
+  margin-top: 10px;
+
+  border: 1px solid rgba(0, 175, 255, .35);
+  border-radius: 9px;
+
+  background:
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(0, 120, 255, .12),
+      transparent 55%
+    ),
+    #031321;
+
+  overflow: hidden;
+}
+
+.trackerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 11px 13px;
+
+  border-bottom: 1px solid rgba(0, 150, 255, .2);
+}
+
+.trackerHeader strong {
+  font-size: 11px;
+  letter-spacing: .5px;
+}
+
+.trackerHeader small {
+  color: #4f91ad;
+  margin-left: 6px;
+}
+
+.trackerLive {
+  color: #00e69b;
+  font-size: 9px;
+}
+
+.distanceBody {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  min-height: 210px;
+}
+
+.distanceScale {
+  padding: 22px 12px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+
+  border-right: 1px solid rgba(0, 150, 255, .16);
+}
+
+.distanceLine {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  gap: 7px;
+  align-items: center;
+
+  font-size: 9px;
+}
+
+.distanceLine i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.distanceLine b {
+  grid-column: 2;
+  font-size: 9px;
+}
+
+.distanceLine.critical i {
+  background: #ff4057;
+  box-shadow: 0 0 8px #ff4057;
+}
+
+.distanceLine.warning i {
+  background: #ffbd25;
+  box-shadow: 0 0 8px #ffbd25;
+}
+
+.distanceLine.safe i {
+  background: #00e79b;
+  box-shadow: 0 0 8px #00e79b;
+}
+
+.distanceLine.critical b {
+  color: #ff5364;
+}
+
+.distanceLine.warning b {
+  color: #ffc72c;
+}
+
+.distanceLine.safe b {
+  color: #00e79b;
+}
+
+.distanceVisual {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 170px;
+  align-items: center;
+  min-width: 0;
+}
+
+.distanceRadar {
+  height: 190px;
+  position: relative;
+  overflow: hidden;
+
+  background:
+    repeating-radial-gradient(
+      ellipse at 50% 100%,
+      transparent 0 22px,
+      rgba(0, 185, 255, .12) 23px 24px
+    );
+}
+
+.distanceRadar::before {
+  content: "";
+  position: absolute;
+
+  left: 8%;
+  right: 8%;
+  bottom: 12px;
+
+  height: 150px;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 38px,
+      rgba(0, 170, 255, .08) 39px 40px
+    );
+
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.radarArc {
+  position: absolute;
+  left: 50%;
+  bottom: 25px;
+
+  transform: translateX(-50%);
+
+  border: 1px solid rgba(0, 220, 255, .25);
+  border-bottom: 0;
+
+  border-radius: 180px 180px 0 0;
+}
+
+.arc1 {
+  width: 130px;
+  height: 65px;
+}
+
+.arc2 {
+  width: 210px;
+  height: 105px;
+}
+
+.arc3 {
+  width: 290px;
+  height: 145px;
+}
+
+.radarVehicle {
+  position: absolute;
+
+  left: 50%;
+  bottom: 13px;
+
+  transform: translateX(-50%);
+
+  width: 30px;
+  height: 40px;
+
+  display: grid;
+  place-items: center;
+
+  color: #eafaff;
+  background: #20394a;
+
+  border: 1px solid #00a9df;
+  border-radius: 4px;
+}
+
+.distanceReadout {
+  padding: 12px;
+}
+
+.distanceReadout small {
+  display: block;
+  color: #62899d;
+  font-size: 8px;
+  letter-spacing: .7px;
+}
+
+.distanceReadout strong {
+  font-size: 34px;
+  color: #eafaff;
+}
+
+.distanceReadout span {
+  color: #8eb6c8;
+}
+
+.distanceState {
+  display: block;
+  margin-top: 10px;
+
+  padding: 8px;
+
+  border-radius: 5px;
+  text-align: center;
+
+  font-size: 9px;
+}
+
+.safeState {
+  color: #00e69b;
+  border: 1px solid rgba(0, 230, 155, .35);
+  background: rgba(0, 230, 155, .08);
+}
+
+.distanceStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  border-top: 1px solid rgba(0, 150, 255, .16);
+}
+
+.distanceStats div {
+  padding: 9px 12px;
+}
+
+.distanceStats div + div {
+  border-left: 1px solid rgba(0, 150, 255, .16);
+}
+
+.distanceStats small {
+  display: block;
+  color: #5d8499;
+  font-size: 8px;
+}
+
+.distanceStats b {
+  font-size: 11px;
+  color: #dff7ff;
+}
+.mineGrid {
+  display: grid;
+  grid-template-columns: 1.35fr .95fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.mapPanel {
+  min-height: 310px;
+}
+
+.mineMap {
+  height: 255px !important;
+  border-radius: 7px;
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 150, 220, .08),
+      rgba(0, 0, 0, .25)
+    );
+}
