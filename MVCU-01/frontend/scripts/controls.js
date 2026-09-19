@@ -83,32 +83,61 @@ function brakeOff() {
 }
 
 export function bindControls() {
-  $('btnStart').onclick = () => {
-    state.vehicleOn = true;
-    state.brake = false;
-    state.direction = 'STOP';
-    updateDrive();
-    sendCommand('START');
-    setText('systemStatus', 'RUNNING');
-    log('Vehicle START command received');
-  };
-  $('btnOff').onclick = () => {
-    state.vehicleOn = false;
-    state.brake = false;
-    state.direction = 'STOP';
-    state.speed = 0;
-    updateDrive();
-    sendCommand('OFF');
-    setText('systemStatus', 'STANDBY');
-    log('Vehicle OFF command received', 'warn');
-  };
-  $('btnStop').onclick = () => {
-    state.direction = 'STOP';
-    state.speed = 0;
-    updateDrive();
-    sendCommand('DIR:STOP');
-    log('Direction STOP');
-  };
+  $('btnStart').onclick = async () => {
+  state.vehicleOn = true;
+  state.brake = false;
+  state.direction = 'STOP';
+  state.speed = 0;
+  state.pwm = 0;
+
+  $('pwmSlider').value = 0;
+  setText('pwmBadge', '0%');
+  setText('gaugeValue', '0%');
+
+  updateDrive();
+
+  await sendCommand('START');
+  await sendCommand('MOTOR:OFF');
+  await sendCommand('PWM:0');
+  await sendCommand('SERVO:60');
+  await sendCommand('BRAKE:OFF');
+
+  setText('systemStatus', 'RUNNING');
+  log('Vehicle STARTED — awaiting movement');
+};
+  $('btnOff').onclick = async () => {
+  state.vehicleOn = false;
+  state.brake = false;
+  state.direction = 'STOP';
+  state.speed = 0;
+  state.pwm = 0;
+
+  $('pwmSlider').value = 0;
+  setText('pwmBadge', '0%');
+  setText('gaugeValue', '0%');
+
+  updateDrive();
+
+  await sendCommand('MOTOR:OFF');
+  await sendCommand('PWM:0');
+  await sendCommand('SERVO:60');
+  await sendCommand('BRAKE:OFF');
+  await sendCommand('OFF');
+
+  setText('systemStatus', 'STANDBY');
+  log('Vehicle OFF');
+};
+ $('btnStop').onclick = () => {
+  state.direction = 'STOP';
+  state.speed = 0;
+
+  updateDrive();
+
+  sendCommand('MOTOR:OFF');
+  sendCommand('SERVO:60');
+
+  log('Vehicle STOPPED');
+};
   document.querySelectorAll('[data-dir]').forEach(button => {
     button.onpointerdown = () => setDirection(button.dataset.dir);
   });
@@ -116,16 +145,29 @@ export function bindControls() {
   $('btnBrake').onpointerup = brakeOff;
   $('btnBrake').onpointerleave = brakeOff;
   $('btnBrake').onpointercancel = brakeOff;
-  $('btnEmergency').onclick = () => {
-    state.vehicleOn = false;
-    state.brake = true;
-    state.direction = 'STOP';
-    state.speed = 0;
-    updateDrive();
-    sendCommand('BRAKE:ON');
-    log('EMERGENCY STOP ACTIVATED', 'err');
-    setText('systemStatus', 'EMERGENCY');
-  };
+$('btnEmergency').onclick = async () => {
+  state.vehicleOn = false;
+  state.brake = true;
+  state.direction = 'STOP';
+  state.speed = 0;
+  state.pwm = 0;
+
+  $('pwmSlider').value = 0;
+  setText('pwmBadge', '0%');
+  setText('gaugeValue', '0%');
+
+  updateDrive();
+
+  // HARD STOP SEQUENCE
+  await sendCommand('MOTOR:OFF');
+  await sendCommand('PWM:0');
+  await sendCommand('SERVO:60');
+  await sendCommand('BRAKE:ON');
+  await sendCommand('EMERGENCY:STOP');
+
+  log('EMERGENCY STOP ACTIVATED — VEHICLE FULLY STOPPED', 'err');
+  setText('systemStatus', 'EMERGENCY');
+};
   $('pwmSlider').oninput = event => {
     state.pwm = +event.target.value;
     setText('pwmBadge', state.pwm + '%');
