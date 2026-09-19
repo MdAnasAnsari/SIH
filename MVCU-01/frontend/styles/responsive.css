@@ -2,3 +2,71 @@
 @media(max-width:760px){body{padding:8px}.header{align-items:flex-start;flex-direction:column}.headerStats{justify-content:flex-start}.layout,.bottom{grid-template-columns:1fr}.cameraFrame{height:270px}.statusList{grid-template-columns:1fr 1fr}.layout>.telemetryPanel{grid-column:auto}}
 @media(max-width:1100px){.mineGrid{grid-template-columns:1fr}.kpiStrip{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.kpiStrip{grid-template-columns:1fr 1fr}.mineMap{height:270px}}
+@media (max-width: 1200px) {
+
+  .layout {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .layout > .controls {
+    grid-column: 1;
+  }
+
+  .layout > .camera {
+    grid-column: 2;
+  }
+
+  .layout > .telemetryPanel {
+    grid-column: 1 / -1;
+  }
+
+  .cameraFrame {
+    height: 300px !important;
+  }
+
+  .bottom {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 850px) {
+
+  .app {
+    width: 96%;
+  }
+
+  .headerStats {
+    flex-wrap: wrap;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .layout > * {
+    grid-column: 1 !important;
+  }
+
+  .mineGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .cameraFrame {
+    height: 260px !important;
+  }
+
+  .distanceBody {
+    grid-template-columns: 1fr;
+  }
+
+  .distanceScale {
+    border-right: 0;
+    border-bottom: 1px solid rgba(0, 150, 255, .16);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
