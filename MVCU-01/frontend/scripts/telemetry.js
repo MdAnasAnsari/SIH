@@ -19,12 +19,28 @@ function updateDemoTelemetry() {
 
   if (state.vehicleOn && state.direction !== 'STOP' && !state.brake) {
     const step = state.speed * dt / 111.32;
-    if (state.direction === 'forward') state.gpsLat += step;
-    if (state.direction === 'reverse') state.gpsLat -= step;
-    if (state.direction === 'left') { state.gpsLon -= step * .55; state.gpsHeading = (state.gpsHeading + 4) % 360; }
-    if (state.direction === 'right') { state.gpsLon += step * .55; state.gpsHeading = (state.gpsHeading + 4) % 360; }
-  }
-  setText('gpsLat', state.gpsLat.toFixed(6)); setText('gpsLon', state.gpsLon.toFixed(6));
+
+    if (state.direction === 'forward') {
+      state.gpsLat += step;
+    }
+
+    if (state.direction === 'reverse') {
+      state.gpsLat -= step;
+    }
+
+    if (state.direction === 'LEFT') {
+      state.gpsLon -= step * .55;
+      state.gpsHeading = (state.gpsHeading + 4) % 360;
+    }
+
+    if (state.direction === 'RIGHT') {
+      state.gpsLon += step * .55;
+      state.gpsHeading = (state.gpsHeading + 4) % 360;
+    }
+  }   // ← THIS closing brace is important
+
+  setText('gpsLat', state.gpsLat.toFixed(6));
+  setText('gpsLon', state.gpsLon.toFixed(6));
   setText('gpsAlt', Math.round(state.gpsAlt + (Math.random() - .5) * .4) + ' m');
   setText('gpsHeading', Math.round(state.gpsHeading) + '°');
   setText('gpsSats', state.vehicleOn ? Math.floor(10 + Math.random() * 5) : 12);
@@ -81,41 +97,84 @@ function updateLaserDisplay() {
     $('mobLaser').className = 'green';
   }
 }
-  setText('laserDistance', state.laser.toFixed(2));
-  const percentage = Math.max(4, Math.min(100, state.laser / 4 * 100));
-  $('laserBar').style.width = percentage + '%';
-  const status = state.laser < .5 ? '● CRITICAL · OBSTACLE VERY CLOSE' : state.laser < 1 ? '● WARNING · REDUCE SPEED' : '● SAFE · CLEAR PATH';
-  setText('laserStatus', status);
-  setText('mobLaser', state.laser < .5 ? 'CRITICAL' : state.laser < 1 ? 'WARNING' : 'SAFE');
-  $('mobLaser').className = state.laser < .5 ? 'red' : state.laser < 1 ? 'yellow' : 'green';
-}
 
 async function pollTelemetry() {
   if (!state.wifiConnected) return;
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 1200);
-    const response = await fetch(ESP32_BASE_URL + '/telemetry', { cache: 'no-store', signal: controller.signal });
+    const response = await fetch(ESP32_BASE_URL + '/status', { cache: 'no-store', signal: controller.signal });
     clearTimeout(timer);
     if (!response.ok) throw new Error('HTTP ' + response.status);
     const data = await response.json();
-    if (data.lat != null) setText('gpsLat', Number(data.lat).toFixed(6));
-    if (data.lon != null) setText('gpsLon', Number(data.lon).toFixed(6));
-    if (data.alt != null) setText('gpsAlt', Number(data.alt).toFixed(0) + ' m');
-    if (data.heading != null) setText('gpsHeading', Number(data.heading).toFixed(0) + '°');
-    if (data.speed != null) { state.speed = Number(data.speed); setText('speed', state.speed.toFixed(1)); }
-    if (data.laser != null) state.laser = Number(data.laser);
-    if (data.ax != null) setText('imuAx', Number(data.ax).toFixed(2));
-    if (data.ay != null) setText('imuAy', Number(data.ay).toFixed(2));
-    if (data.az != null) setText('imuAz', Number(data.az).toFixed(2));
-    if (data.roll != null) setText('imuRoll', Number(data.roll).toFixed(1) + '°');
-    if (data.pitch != null) setText('imuPitch', Number(data.pitch).toFixed(1) + '°');
-    } catch (error) {
+    if (data.motorEnabled != null) {
+  state.vehicleOn = Boolean(data.motorEnabled);
+}
+
+if (data.brake != null) {
+  state.brake = Boolean(data.brake);
+}
+
+if (data.pwm != null) {
+  state.pwm = Number(data.pwm);
+
+  const pwmPercent = Math.round(
+    (state.pwm / 255) * 100
+  );
+
+  setText('pwmBadge', pwmPercent + '%');
+  setText('gaugeValue', pwmPercent + '%');
+
+  if ($('pwmSlider')) {
+    $('pwmSlider').value = pwmPercent;
+  }
+}
+
+if (data.gear != null) {
+  state.gear = Number(data.gear);
+  setText('currentGear', 'G' + state.gear);
+
+  document.querySelectorAll('[data-gear]').forEach(button => {
+    button.classList.toggle(
+      'active',
+      Number(button.dataset.gear) === state.gear
+    );
+  });
+}
+
+if (data.steering != null) {
+  const steering = Number(data.steering);
+
+  if (steering < 45) {
+    state.direction = 'LEFT';
+  }
+  else if (steering > 75) {
+    state.direction = 'RIGHT';
+  }
+  else if (!state.vehicleOn) {
+    state.direction = 'STOP';
+  }
+}
+
+if (data.distance_mm != null) {
+  state.laser = Number(data.distance_mm);
+}
+
+if (data.sensor_ok != null) {
+  if (!data.sensor_ok) {
+    state.laser = null;
+  }
+}
+
+updateLaserDisplay();
+
+  } catch (error) {
     setText('mobLink', 'OFFLINE');
     $('mobLink').className = 'red';
 
     console.warn('ESP32 telemetry unavailable:', error.message);
   }
+}
 
 export function startTelemetry() {
   setInterval(updateDemoTelemetry, 500);
