@@ -13,13 +13,34 @@ export function updateDrive() {
 }
 
 function setDirection(direction) {
+
+  if (state.mode === 'AUTO') {
+    log(
+      'Manual movement blocked: vehicle is in AUTO mode',
+      'warn'
+    );
+    return;
+  }
+
   if (!state.vehicleOn) {
     log('START required before direction command', 'warn');
     return;
   }
+
+  if (state.brake) {
+    log('Movement blocked: BRAKE is active', 'warn');
+    return;
+  }
+
   state.direction = direction;
-  state.speed = direction === 'STOP' ? 0 : Math.max(0.5, state.pwm * .18);
+
+  state.speed =
+    direction === 'STOP'
+      ? 0
+      : Math.max(0.5, state.pwm * 0.18);
+
   updateDrive();
+
   sendCommand('DIR:' + direction);
 }
 
@@ -38,8 +59,62 @@ function brakeOff() {
   sendCommand('BRAKE:OFF');
   log('BRAKE RELEASED');
 }
+function setDriveMode(mode) {
+  const previousMode = state.mode;
 
+  state.mode = mode;
+
+  document.querySelectorAll('[data-mode]').forEach(button => {
+    button.classList.toggle(
+      'active',
+      button.dataset.mode === mode
+    );
+  });
+
+  setText('systemStatus', mode);
+
+  log(`Driving mode changed: ${previousMode} → ${mode}`);
+
+  /*
+   * Send the selected mode to ESP32.
+   */
+  sendCommand('MODE:' + mode);
+
+  /*
+   * Safety:
+   * Whenever the mode changes, stop the vehicle first.
+   */
+  state.direction = 'STOP';
+  state.speed = 0;
+
+  updateDrive();
+
+  sendCommand('MOTOR:OFF');
+  sendCommand('PWM:0');
+
+  /*
+   * Keep steering centered when changing modes.
+   */
+  sendCommand('SERVO:60');
+
+  if (mode === 'MANUAL') {
+    log('MANUAL mode active — operator controls enabled');
+  }
+
+  if (mode === 'AUTO') {
+    log('AUTO mode active — autonomous control enabled', 'warn');
+  }
+
+  if (mode === 'ASSIST') {
+    log('ASSIST mode active — driver assistance enabled');
+  }
+}
 export function bindControls() {
+    document.querySelectorAll('[data-mode]').forEach(button => {
+    button.onclick = () => {
+      setDriveMode(button.dataset.mode);
+    };
+  });
   $('btnStart').onclick = () => {
     state.vehicleOn = true;
     state.brake = false;
