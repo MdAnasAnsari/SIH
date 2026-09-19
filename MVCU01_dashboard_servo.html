@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVCU-01 · Mining Vehicle Fleet & Safety Dashboard</title>
+<style>
+:root{
+  --bg:#07111c; --panel:#0b1a2a; --panel2:#0e2235; --line:#17466d;
+  --blue:#168cff; --cyan:#25d7ff; --green:#16e38a; --yellow:#ffc21a;
+  --red:#ff3f52; --orange:#ff9f1c; --text:#eef7ff; --muted:#8da7bd;
+  --shadow:0 18px 45px rgba(0,0,0,.35); --radius:14px;
+  --font:Inter,Segoe UI,Arial,sans-serif; --mono:Consolas,ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -20%,#12314b 0,#07111c 48%,#040a10 100%);color:var(--text);font-family:var(--font);min-height:100vh;padding:16px}
+button,input{font:inherit}.app{max-width:1500px;margin:auto}
+.header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 18px;background:linear-gradient(135deg,#0d2134,#091522);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:14px}.brandIcon{width:48px;height:48px;border:2px solid var(--cyan);border-radius:12px;display:grid;place-items:center;font-size:25px;box-shadow:0 0 20px rgba(37,215,255,.15)}
+h1{font-size:24px;margin:0;letter-spacing:.04em}.subtitle{font-size:11px;color:var(--muted);letter-spacing:.13em;margin-top:3px}
+.headerStats{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:flex-end}.stat{font-family:var(--mono);font-size:11px;color:var(--muted)}.stat b{display:block;color:var(--text);font-size:13px;margin-top:4px}.online{color:var(--green)!important}.mode{display:flex;gap:4px;border:1px solid var(--line);padding:4px;border-radius:9px}.mode button{border:0;background:transparent;color:var(--muted);padding:8px 13px;border-radius:6px;cursor:pointer}.mode button.active{background:var(--blue);color:white}
+.layout{display:grid;grid-template-columns:320px minmax(420px,1fr) 340px;gap:14px}.bottom{display:grid;grid-template-columns:1.25fr 1fr .85fr;gap:14px;margin-top:14px}
+.panel{background:linear-gradient(180deg,rgba(14,34,53,.97),rgba(7,22,35,.97));border:1px solid var(--line);border-radius:var(--radius);padding:15px;box-shadow:var(--shadow)}
+.panelTitle{display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.08em;margin-bottom:13px}.panelTitle span:first-child{font-weight:700}.badge{font:700 10px var(--mono);padding:5px 8px;border-radius:999px;background:#12334b;color:var(--muted)}.badge.online{background:rgba(22,227,138,.1);color:var(--green)!important}
+/* controls */
+.powerRow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:1px solid var(--line);background:#0c263d;color:var(--text);border-radius:10px;padding:13px;cursor:pointer;font-weight:700;letter-spacing:.04em;transition:.15s}.btn:hover{transform:translateY(-1px);filter:brightness(1.15)}.btn.start{background:linear-gradient(180deg,#11db82,#08a963);border-color:#15ed92}.btn.off{background:linear-gradient(180deg,#ff5362,#d8273c);border-color:#ff5362}.btn.brake{border-color:#d58c00;color:#ffd56c;background:#2a220f}.btn.emergency{background:#35121a;border-color:#ff3f52;color:#ff6d7b}
+.pad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:13px 0}.dir{min-height:62px}.dir.fwd{grid-column:2}.dir.rev{grid-column:2}.stop{border-radius:50%;height:70px;align-self:center;background:#351622;border:2px solid var(--red);color:#ff7180}.safetyRow{display:grid;grid-template-columns:1fr 1fr;gap:9px}.small{font-size:10px;padding:10px}
+/* camera */
+.camera{padding-bottom:12px}.cameraFrame{height:390px;background:#03080d;border:1px solid #24577f;border-radius:10px;overflow:hidden;position:relative;display:grid;place-items:center}.cameraFrame img{width:100%;height:100%;object-fit:cover;display:none}.placeholder{text-align:center;color:var(--muted);font-family:var(--mono);font-size:12px}.cameraOverlay{position:absolute;left:10px;top:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}.rec{background:rgba(0,0,0,.65);padding:5px 8px;border-radius:6px;font:10px var(--mono)}.cameraControls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:9px}.cameraInput{display:flex;gap:7px;margin-top:9px}.cameraInput input{min-width:0;flex:1;background:#071725;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px;font:11px var(--mono)}
+/* telemetry */
+.teleGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{border:1px solid #17476d;border-radius:10px;padding:11px;background:#081a2b}.metric label{display:block;color:var(--muted);font-size:10px;margin-bottom:7px}.metric strong{font:700 20px var(--mono)}.metric small{color:var(--muted);font-size:10px}.green{color:var(--green)}.yellow{color:var(--yellow)}.red{color:var(--red)}.cyan{color:var(--cyan)}
+.laser{grid-column:1/-1;border-color:#805f18;background:linear-gradient(180deg,#211b0b,#0d1921)}.laserValue{display:flex;align-items:baseline;gap:7px}.laserValue strong{font-size:34px;color:var(--yellow)}.bar{height:8px;background:#162d3e;border-radius:10px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;width:78%;background:var(--green);border-radius:10px;transition:.3s}.safeStatus{margin-top:8px;font:11px var(--mono)}
+/* lower */
+.log{height:235px;overflow:auto;background:#040a10;border:1px solid #123650;border-radius:9px;padding:10px;font:11px/1.7 var(--mono)}.logLine{white-space:pre-wrap}.time{color:#66849b}.logOk{color:var(--green)}.logCmd{color:var(--cyan)}.logWarn{color:var(--yellow)}.logErr{color:var(--red)}
+.gaugeBox{display:grid;place-items:center}.gauge{width:210px;height:110px;border-radius:210px 210px 0 0;background:conic-gradient(from 270deg,var(--blue) 0 65%,#163550 65% 100%);position:relative;overflow:hidden}.gauge:after{content:"";position:absolute;inset:22px 22px 0;border-radius:190px 190px 0 0;background:#071827}.gaugeText{position:absolute;z-index:2;bottom:13px;text-align:center;width:100%;font:700 25px var(--mono)}.gaugeText small{display:block;font:10px var(--font);color:var(--muted)}
+.slider{width:100%;accent-color:var(--blue)}.gear{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}.gear button{padding:10px 5px;border:1px solid var(--line);background:#081b2d;color:var(--muted);border-radius:7px;cursor:pointer}.gear button.active{background:var(--blue);color:white}.headlights{display:grid;gap:7px}.headlights button{text-align:left}.headlights button.active{border-color:var(--yellow);color:var(--yellow)}
+.statusList{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.statusCell{border:1px solid var(--line);padding:10px;border-radius:9px}.statusCell label{display:block;color:var(--muted);font-size:9px;margin-bottom:5px}.statusCell b{font-size:12px}
+.footer{display:flex;justify-content:space-between;color:#65869f;font:10px var(--mono);padding:12px 4px 0}.footer b{color:var(--cyan)}
+@media(max-width:1100px){.layout{grid-template-columns:280px 1fr}.layout>.telemetryPanel{grid-column:1/-1}.bottom{grid-template-columns:1fr 1fr}.bottom>.mobility{grid-column:1/-1}}
+@media(max-width:760px){body{padding:8px}.header{align-items:flex-start;flex-direction:column}.headerStats{justify-content:flex-start}.layout,.bottom{grid-template-columns:1fr}.cameraFrame{height:270px}.statusList{grid-template-columns:1fr 1fr}.layout>.telemetryPanel{grid-column:auto}}
+
+/* ===== Mining telemetry upgrades ===== */
+.mineGrid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;margin-top:14px}
+.mapPanel{min-height:390px}
+.mineMap{height:320px;position:relative;overflow:hidden;border:1px solid #24577f;border-radius:10px;
+  background:
+    linear-gradient(25deg,transparent 0 48%,rgba(37,215,255,.09) 49% 50%,transparent 51%),
+    linear-gradient(155deg,transparent 0 58%,rgba(22,227,138,.07) 59% 60%,transparent 61%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px),
+    #06131f}
+.mineMap:before{content:"MINE SITE · ZONE A";position:absolute;left:14px;top:12px;color:#6d8fa8;font:10px var(--mono);letter-spacing:.12em}
+.road{position:absolute;height:22px;background:#142f42;border:1px dashed #2c617d;transform-origin:left center;opacity:.9}
+.road.r1{width:78%;left:8%;top:55%;transform:rotate(-12deg)}
+.road.r2{width:55%;left:29%;top:29%;transform:rotate(34deg)}
+.road.r3{width:47%;left:7%;top:77%;transform:rotate(5deg)}
+.zone{position:absolute;border:1px dashed rgba(255,194,26,.35);border-radius:50%;width:150px;height:95px;right:8%;top:10%}
+.vehicleDot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid white;box-shadow:0 0 16px rgba(22,227,138,.8);transform:translate(-50%,-50%);transition:.7s;z-index:3}
+.vehicleDot.selected{background:var(--cyan);box-shadow:0 0 18px rgba(37,215,255,.9)}
+.mapLegend{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;color:var(--muted);font:10px var(--mono)}
+.legendDot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--green)}
+.legendDot.warn{background:var(--yellow)}.legendDot.alert{background:var(--red)}
+.gpsCard{border-color:#1c6388;background:linear-gradient(180deg,#08243a,#071722)}
+.gpsCoords{font:700 18px var(--mono);color:var(--cyan);line-height:1.5}
+.gpsMeta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.gpsMeta div{border:1px solid #16476a;border-radius:8px;padding:8px;background:#061522}
+.gpsMeta label{display:block;color:var(--muted);font-size:9px}.gpsMeta b{font:12px var(--mono)}
+.imuCard{border-color:#275f50;background:linear-gradient(180deg,#09241e,#071722)}
+.imuAxes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.axis{padding:8px;border:1px solid #205846;border-radius:8px;background:#061a17;text-align:center}
+.axis label{display:block;color:var(--muted);font-size:9px}.axis b{font:15px var(--mono)}
+.attitude{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.alertPanel{max-height:390px}
+.alertFeed{height:320px;overflow:auto}
+.alertItem{padding:10px;border-left:3px solid var(--yellow);background:#0a1a28;border-radius:7px;margin-bottom:7px;font-size:10px}
+.alertItem.critical{border-left-color:var(--red)}.alertItem.ok{border-left-color:var(--green)}
+.alertItem b{display:block;font-size:11px;margin-bottom:3px}.alertItem span{color:var(--muted);font:9px var(--mono)}
+.kpiStrip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+.kpi{padding:12px;border:1px solid var(--line);border-radius:10px;background:#081a2b}
+.kpi label{display:block;color:var(--muted);font-size:9px}.kpi strong{display:block;font:700 21px var(--mono);margin-top:5px}.kpi small{color:var(--muted);font-size:9px}
+@media(max-width:1100px){.mineGrid{grid-template-columns:1fr}.kpiStrip{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.kpiStrip{grid-template-columns:1fr 1fr}.mineMap{height:270px}}
+
+
+/* Layout correction: centered, conventional vehicle D-pad */
+.pad{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(3,minmax(72px,auto));
+  gap:8px;
+  align-items:stretch;
+}
+.pad .dir.fwd{grid-column:2;grid-row:1}
+.pad .dir[data-dir="left"]{grid-column:1;grid-row:2}
+.pad #btnStop{grid-column:2;grid-row:2}
+.pad .dir[data-dir="right"]{grid-column:3;grid-row:2}
+.pad .dir.rev{grid-column:2;grid-row:3}
+.pad .dir,.pad .stop{width:100%;min-width:0}
+.safetyRow{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+.safetyRow .btn{min-width:0;overflow-wrap:anywhere}
+@media(max-width:420px){
+  .pad{grid-template-rows:repeat(3,minmax(66px,auto));gap:7px}
+  .pad .btn{padding:10px 6px;font-size:clamp(12px,3.5vw,16px)}
+  .safetyRow{gap:8px}
+  .safetyRow .btn{padding:12px 7px;font-size:clamp(12px,3.4vw,16px)}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+  <div class="brand"><div class="brandIcon">🚗</div><div><h1>MVCU-01</h1><div class="subtitle">MINING VEHICLE CONTROL UNIT · REAL-TIME FLEET & SAFETY MONITORING</div></div></div>
+  <div class="headerStats">
+    <div class="stat">WI-FI<b id="wifiStatus" class="online">OFFLINE</b></div>
+    <div class="stat">CONTROLLER<b id="controllerStatus">OFFLINE</b></div>
+    <div class="stat">CAMERA<b id="cameraStatus">OFFLINE</b></div>
+    <div class="mode"><button class="active">MANUAL</button><button>AUTO</button><button>ASSIST</button></div>
+    <div class="stat">SYSTEM<b id="systemStatus" class="online">STANDBY</b></div>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="panel controls">
+    <div class="panelTitle"><span>🎮 VEHICLE CONTROL</span><span class="badge" id="driveBadge">STOPPED</span></div>
+    <div class="powerRow"><button class="btn start" id="btnStart">▶ START</button><button class="btn off" id="btnOff">⏻ OFF</button></div>
+    <div class="pad">
+      <button class="btn dir fwd" data-dir="forward">▲<br>FORWARD</button>
+      <button class="btn dir" data-dir="left">◀<br>LEFT</button>
+      <button class="btn stop" id="btnStop">STOP</button>
+      <button class="btn dir" data-dir="right">▶<br>RIGHT</button>
+      <button class="btn dir rev" data-dir="reverse">▼<br>REVERSE</button>
+    </div>
+    <div class="safetyRow"><button class="btn brake" id="btnBrake">⛔ BRAKE<br><small>HOLD TO STOP</small></button><button class="btn emergency" id="btnEmergency">⚠ EMERGENCY<br>STOP</button></div>
+    <div class="panelTitle" style="margin-top:18px"><span>LIGHTS</span></div>
+    <div class="headlights" id="headlights"><button class="btn active" data-head="off">○ OFF</button><button class="btn" data-head="low">◉ LOW</button><button class="btn" data-head="high">◉ HIGH</button></div>
+  </section>
+
+  <section class="panel camera">
+    <div class="panelTitle"><span>📷 LIVE CAMERA · PHONE</span><span class="badge" id="cameraBadge">OFFLINE</span></div>
+    <div class="cameraFrame" id="cameraFrame">
+      <img id="cameraStream" alt="Phone camera live stream">
+      <div class="placeholder" id="cameraPlaceholder">CAMERA FEED<br><br>Enter your phone camera stream URL below<br>and press START CAMERA.</div>
+      <div class="cameraOverlay"><span class="rec" id="cameraRec">● CAMERA OFF</span><span class="rec">MVCU-01</span></div>
+    </div>
+    <div class="cameraInput"><input id="cameraUrl" value="http://192.168.4.20:8080/video" placeholder="http://PHONE-IP:PORT/video"><button class="btn small" id="btnSetCamera">SET</button></div>
+    <div class="cameraControls"><button class="btn start" id="btnCameraStart">▶ START CAMERA</button><button class="btn off" id="btnCameraStop">■ STOP</button><button class="btn" id="btnFullscreen">⛶ FULL SCREEN</button></div>
+  </section>
+
+  <section class="panel telemetryPanel">
+    <div class="panelTitle"><span>📊 TELEMETRY</span><span class="badge online">LIVE DATA</span></div>
+    <div class="teleGrid">
+      <div class="metric"><label>SPEED</label><strong id="speed">0.0</strong> <small>km/h</small></div>
+      <div class="metric"><label>DIRECTION</label><strong id="direction" class="cyan">STOP</strong></div>
+      <div class="metric"><label>TRIP DISTANCE</label><strong id="distance">0.00</strong> <small>km</small></div>
+      <div class="metric"><label>MOTOR RPM</label><strong id="rpm">0</strong></div>
+      <div class="metric"><label>BATTERY VOLTAGE</label><strong id="voltage">24.6</strong> <small>V</small></div>
+      <div class="metric"><label>CURRENT</label><strong id="current">0.0</strong> <small>A</small></div>
+      <div class="metric"><label>POWER</label><strong id="power">0</strong> <small>W</small></div>
+      <div class="metric"><label>BATTERY</label><strong id="battery" class="green">92</strong><small>%</small></div>
+      <div class="metric"><label>MOTOR TEMP</label><strong id="motorTemp">32</strong><small> °C</small></div>
+      <div class="metric"><label>CONTROLLER TEMP</label><strong id="controllerTemp">30</strong><small> °C</small></div>
+      <div class="metric laser"><label>📡 LASER DISTANCE SENSOR · FRONT OBSTACLE</label><div class="laserValue"><strong id="laserDistance">2.36</strong><small>meters</small></div><div class="bar"><i id="laserBar"></i></div><div class="safeStatus" id="laserStatus">● SAFE · CLEAR PATH</div></div>
+    </div>
+  </section>
+</main>
+
+
+<section class="mineGrid">
+  <div class="panel mapPanel">
+    <div class="panelTitle"><span>🗺️ MINE SITE · REAL-TIME GPS TRACKING</span><span class="badge online" id="gpsBadge">GPS FIX</span></div>
+    <div class="mineMap" id="mineMap">
+      <div class="road r1"></div><div class="road r2"></div><div class="road r3"></div><div class="zone"></div>
+      <div class="vehicleDot selected" id="vehicleDot" style="left:42%;top:57%" title="MVCU-01"></div>
+      <div class="vehicleDot" style="left:68%;top:37%;background:var(--yellow)" title="HAULER-02"></div>
+      <div class="vehicleDot" style="left:24%;top:74%;background:var(--green)" title="DUMPER-03"></div>
+      <div style="position:absolute;left:45%;top:60%;font:9px var(--mono);color:#9ab4c7">MVCU-01</div>
+      <div style="position:absolute;left:70%;top:40%;font:9px var(--mono);color:#9ab4c7">HAULER-02</div>
+      <div style="position:absolute;left:26%;top:77%;font:9px var(--mono);color:#9ab4c7">DUMPER-03</div>
+    </div>
+    <div class="mapLegend">
+      <span><i class="legendDot"></i>ACTIVE</span>
+      <span><i class="legendDot warn"></i>IDLE</span>
+      <span><i class="legendDot alert"></i>ALERT</span>
+      <span>GPS UPDATE: <b id="gpsUpdateAge">0.5s</b></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panelTitle"><span>📍 GPS POSITION</span><span class="badge online">LIVE</span></div>
+    <div class="metric gpsCard">
+      <label>LATITUDE / LONGITUDE</label>
+      <div class="gpsCoords"><span id="gpsLat">30.5164</span>°<br><span id="gpsLon">75.9553</span>°</div>
+      <div class="gpsMeta">
+        <div><label>ALTITUDE</label><b id="gpsAlt">248 m</b></div>
+        <div><label>ACCURACY</label><b id="gpsAccuracy">±2.1 m</b></div>
+        <div><label>SATELLITES</label><b id="gpsSats">12</b></div>
+        <div><label>HEADING</label><b id="gpsHeading">0°</b></div>
+      </div>
+    </div>
+
+    <div class="panelTitle" style="margin-top:12px"><span>🧭 IMU · 9-AXIS MOTION</span><span class="badge online">LIVE</span></div>
+    <div class="metric imuCard">
+      <label>ACCELERATION · m/s²</label>
+      <div class="imuAxes">
+        <div class="axis"><label>X</label><b id="imuAx">0.02</b></div>
+        <div class="axis"><label>Y</label><b id="imuAy">-0.01</b></div>
+        <div class="axis"><label>Z</label><b id="imuAz">9.81</b></div>
+      </div>
+      <div class="attitude">
+        <div class="axis"><label>ROLL</label><b id="imuRoll">0.0°</b></div>
+        <div class="axis"><label>PITCH</label><b id="imuPitch">0.0°</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="kpiStrip">
+  <div class="kpi"><label>FLEET UTILIZATION</label><strong id="fleetUtil">78%</strong><small>ACTIVE / AVAILABLE</small></div>
+  <div class="kpi"><label>AVG SPEED</label><strong id="avgSpeed">18.4</strong><small>km/h</small></div>
+  <div class="kpi"><label>TOTAL DISTANCE</label><strong id="fleetDistance">126.8</strong><small>km TODAY</small></div>
+  <div class="kpi"><label>FUEL / ENERGY EFFICIENCY</label><strong id="efficiency">4.8</strong><small>km/L equivalent</small></div>
+</section>
+
+<section class="panel alertPanel" style="margin-top:14px">
+  <div class="panelTitle"><span>🚨 ALERTS & SAFETY EVENTS</span><span class="badge" id="alertCount">2 ACTIVE</span></div>
+  <div class="alertFeed" id="alertFeed">
+    <div class="alertItem critical"><b>FRONT OBSTACLE MONITOR</b><span>19:08:02 · MVCU-01</span><br>Laser distance within monitored safety zone.</div>
+    <div class="alertItem ok"><b>GPS POSITION LOCKED</b><span>19:07:58 · MVCU-01</span><br>GNSS fix acquired with 12 satellites.</div>
+  </div>
+</section>
+
+<section class="bottom">
+  <div class="panel">
+    <div class="panelTitle"><span>📝 SYSTEM EVENT LOG</span><button class="btn small" id="clearLog">CLEAR LOG</button></div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panelTitle"><span>⚡ SPEED / PWM</span><span class="badge" id="pwmBadge">0%</span></div>
+    <div class="gaugeBox"><div class="gauge"><div class="gaugeText"><span id="gaugeValue">0%</span><small>PWM OUTPUT</small></div></div></div>
+    <input class="slider" id="pwmSlider" type="range" min="0" max="100" value="0">
+    <div style="display:flex;justify-content:space-between;color:var(--muted);font:10px var(--mono);margin-top:5px"><span>0%</span><span>100%</span></div>
+    <div class="gear"><button data-gear="1">G1</button><button data-gear="2">G2</button><button data-gear="3">G3</button><button data-gear="4">G4</button><button data-gear="5">G5</button></div>
+    <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:10px">CURRENT GEAR <strong id="currentGear" class="cyan" style="font-size:20px">G1</strong></div>
+  </div>
+
+  <div class="panel mobility">
+    <div class="panelTitle"><span>🛡 MOBILITY / SAFETY</span></div>
+    <div class="statusList">
+      <div class="statusCell"><label>DIRECTION</label><b id="mobDirection" class="cyan">STOP</b></div>
+      <div class="statusCell"><label>BRAKE</label><b id="mobBrake" class="green">RELEASED</b></div>
+      <div class="statusCell"><label>MOTOR</label><b id="mobMotor" class="green">STOPPED</b></div>
+      <div class="statusCell"><label>LASER</label><b id="mobLaser" class="green">SAFE</b></div>
+      <div class="statusCell"><label>ESP32 LINK</label><b id="mobLink" class="red">OFFLINE</b></div>
+      <div class="statusCell"><label>CAMERA</label><b id="mobCamera" class="red">OFFLINE</b></div>
+    </div>
+    <div class="panelTitle" style="margin-top:17px"><span>ESP32 HARDWARE LINK · WI-FI</span></div>
+    <div class="stat" style="padding:10px;border:1px solid var(--line);border-radius:9px">CONTROLLER IP<b>192.168.4.1</b>PROTOCOL<b>HTTP / GET</b></div>
+    <div style="display:flex;gap:8px;margin-top:9px"><button class="btn start small" id="btnConnect">CONNECT WI-FI</button><button class="btn small" id="btnDisconnect">DISCONNECT</button></div>
+  </div>
+</section>
+
+<div class="footer"><span>MVCU-01 · Smart Mining Vehicle Monitoring & Control System</span><span><b>SAFE</b> · <b>CONNECTED</b> · <b>EFFICIENT</b></span></div>
+</div>
+
+<script>
+const ESP32_BASE_URL='http://192.168.4.1';
+let wifiConnected=false, vehicleOn=false, direction='STOP', brake=false, pwm=0, gear=1, tripKm=0, speed=0;
+const $=id=>document.getElementById(id);
+function log(msg,type='ok'){const d=document.createElement('div');d.className='logLine '+(type==='cmd'?'logCmd':type==='warn'?'logWarn':type==='err'?'logErr':'logOk');d.innerHTML='<span class="time">['+new Date().toLocaleTimeString()+']</span> '+msg;$('log').appendChild(d);$('log').scrollTop=$('log').scrollHeight}
+function setText(id,v){$(id).textContent=v}
+async function sendCommand(cmd){
+  log('TX → '+cmd,'cmd');
+  try{const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),1800);const r=await fetch(ESP32_BASE_URL+'/cmd?c='+encodeURIComponent(cmd),{method:'GET',signal:ctl.signal,cache:'no-store'});clearTimeout(timer);if(!r.ok)throw new Error('HTTP '+r.status);wifiConnected=true;updateLink();return true}
+  catch(e){wifiConnected=false;updateLink();log('Controller unreachable: '+e.message,'err');return false}
+}
+function updateLink(){
+  setText('wifiStatus',wifiConnected?'CONNECTED':'OFFLINE');setText('controllerStatus',wifiConnected?'CONNECTED':'OFFLINE');setText('mobLink',wifiConnected?'ONLINE':'OFFLINE');$('mobLink').className=wifiConnected?'green':'red';
+}
+function updateDrive(){setText('driveBadge',vehicleOn?(brake?'BRAKING':direction):'STOPPED');setText('direction',direction);setText('mobDirection',direction);setText('mobBrake',brake?'APPLIED':'RELEASED');setText('mobMotor',vehicleOn&&!brake?'RUNNING':'STOPPED');$('mobBrake').className=brake?'red':'green';$('mobMotor').className=vehicleOn&&!brake?'green':'muted';}
+function setDirection(d){
+  if(!vehicleOn){log('Press START before driving','warn');return}
+  if(brake){log('Brake is applied; release brake first','warn');return}
+  direction=d.toUpperCase();
+  updateDrive();
+  const command = d==='forward' ? 'MOTOR:FORWARD' : d==='reverse' ? 'MOTOR:BACKWARD' : 'MOTOR:OFF';
+  sendCommand(command);
+}
+$('btnStart').onclick=()=>{vehicleOn=true;brake=false;direction='STOP';updateDrive();sendCommand('MOTOR:OFF');setText('systemStatus','RUNNING');log('Drive controls enabled')};
+$('btnOff').onclick=()=>{vehicleOn=false;brake=false;direction='STOP';speed=0;updateDrive();sendCommand('MOTOR:OFF');sendCommand('SERVO:60');setText('systemStatus','STANDBY');log('Vehicle outputs turned off','warn')};
+$('btnStop').onclick=()=>{direction='STOP';speed=0;updateDrive();sendCommand('MOTOR:OFF');log('Drive motor stopped')};
+// Hold-to-steer: LEFT=30°, RIGHT=90°, release/cancel/leave=centre 60°.
+// Forward/reverse run while held; release sends MOTOR:OFF.
+const STEER={left:30,right:90,center:60};
+function steerPress(dir){
+  if(!vehicleOn||brake){log('START and release brake before steering','warn');return;}
+  direction=dir.toUpperCase(); updateDrive(); sendCommand('SERVO:'+STEER[dir]);
+}
+function steerRelease(){
+  sendCommand('SERVO:'+STEER.center);
+  if(direction==='LEFT'||direction==='RIGHT'){direction='STOP';updateDrive();}
+}
+function driveRelease(){
+  sendCommand('MOTOR:OFF');
+  if(direction==='FORWARD'||direction==='REVERSE'){direction='STOP';speed=0;updateDrive();}
+}
+document.querySelectorAll('[data-dir]').forEach(b=>{
+  const dir=b.dataset.dir.toLowerCase();
+  if(dir==='left'||dir==='right'){
+    b.onpointerdown=e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){};steerPress(dir)};
+    b.onpointerup=steerRelease; b.onpointercancel=steerRelease; b.onpointerleave=steerRelease;
+  } else {
+    b.onpointerdown=e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){};setDirection(dir)};
+    b.onpointerup=driveRelease; b.onpointercancel=driveRelease; b.onpointerleave=driveRelease;
+  }
+});
+function brakeOn(){brake=true;speed=0;updateDrive();sendCommand('BRAKE:ON');log('BRAKE APPLIED','warn')};function brakeOff(){if(!brake)return;brake=false;updateDrive();sendCommand('BRAKE:OFF');log('BRAKE RELEASED')};
+$('btnBrake').onpointerdown=brakeOn;$('btnBrake').onpointerup=brakeOff;$('btnBrake').onpointerleave=brakeOff;$('btnBrake').onpointercancel=brakeOff;
+$('btnEmergency').onclick=async()=>{
+  // Emergency action: issue the known motor-off command and centre steering.
+  vehicleOn=false;brake=true;direction='STOP';speed=0;pwm=0;
+  $('pwmSlider').value=0;setText('pwmBadge','0%');setText('gaugeValue','0%');
+  updateDrive();setText('systemStatus','EMERGENCY');
+  await sendCommand('MOTOR:OFF');await sendCommand('SERVO:60');
+  // BRAKE:ON is sent only as an additional request; it needs matching firmware/hardware.
+  await sendCommand('BRAKE:ON');
+  log('EMERGENCY STOP requested: motor OFF + steering centre','err');
+};
+$('pwmSlider').oninput=e=>{pwm=+e.target.value;setText('pwmBadge',pwm+'%');setText('gaugeValue',pwm+'%');sendCommand('PWM:'+pwm);if(vehicleOn&&!brake&&direction!=='STOP')speed=pwm*.18};
+document.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=>{gear=+b.dataset.gear;document.querySelectorAll('[data-gear]').forEach(x=>x.classList.toggle('active',x===b));setText('currentGear','G'+gear);sendCommand('GEAR:'+gear);log('Gear changed → G'+gear)});
+document.querySelector('[data-gear="1"]').classList.add('active');
+document.querySelectorAll('[data-head]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-head]').forEach(x=>x.classList.toggle('active',x===b));sendCommand('HEAD:'+b.dataset.head);log('Headlight → '+b.dataset.head.toUpperCase())});
+$('btnConnect').onclick=async()=>{log('Connecting to ESP32 controller at '+ESP32_BASE_URL+'…','cmd');try{const r=await fetch(ESP32_BASE_URL+'/',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);wifiConnected=true;updateLink();log('ESP32 Wi-Fi controller CONNECTED');}catch(e){wifiConnected=false;updateLink();log('Connect failed. Join Wi-Fi MVCU-01 first.','err')}};
+$('btnDisconnect').onclick=()=>{wifiConnected=false;updateLink();log('ESP32 Wi-Fi link marked disconnected','warn')};
+$('clearLog').onclick=()=>{$('log').innerHTML='';log('Log cleared')};
+// Phone camera uses a direct MJPEG/HTTP stream. This is not laptop webcam access.
+function startCamera(){const url=$('cameraUrl').value.trim();if(!url){log('Enter phone camera stream URL','warn');return}$('cameraStream').src=url; $('cameraStream').style.display='block';$('cameraPlaceholder').style.display='none';setText('cameraStatus','ONLINE');setText('cameraBadge','ONLINE');setText('cameraRec','● CAMERA LIVE');setText('mobCamera','ONLINE');$('mobCamera').className='green';log('Phone camera stream started')}
+function stopCamera(){const img=$('cameraStream');img.src='';img.style.display='none';$('cameraPlaceholder').style.display='block';setText('cameraStatus','OFFLINE');setText('cameraBadge','OFFLINE');setText('cameraRec','● CAMERA OFF');setText('mobCamera','OFFLINE');$('mobCamera').className='red';log('Phone camera stream stopped','warn')}
+$('btnCameraStart').onclick=startCamera;$('btnCameraStop').onclick=stopCamera;$('btnSetCamera').onclick=()=>{stopCamera();log('Camera URL updated')};$('btnFullscreen').onclick=()=>{const f=$('cameraFrame');if(!document.fullscreenElement)f.requestFullscreen?.();else document.exitFullscreen?.()};
+// Demo telemetry fallback. Replace these values with ESP32 sensor JSON when connected.
+let last=Date.now();
+let gpsLat=30.5164,gpsLon=75.9553,gpsAlt=248,gpsHeading=0;
+let laser=2.36, imuRoll=0, imuPitch=0;
+setInterval(()=>{
+  const dt=(Date.now()-last)/3600000; last=Date.now();
+  if(vehicleOn&&!brake&&direction!=='STOP'){speed=Math.max(0,pwm*.18);tripKm+=speed*dt}
+  else speed=0;
+  const current=vehicleOn&&!brake?pwm*.12:0;
+  const motorTemp=32+(vehicleOn?Math.min(28,pwm*.22):0);
+  const controllerTemp=30+(vehicleOn?Math.min(22,pwm*.15):0);
+  setText('speed',speed.toFixed(1)); setText('distance',tripKm.toFixed(2));
+  setText('rpm',Math.round(speed*150)); setText('current',current.toFixed(1));
+  setText('power',Math.round(24.6*current));
+  setText('motorTemp',motorTemp.toFixed(0)); setText('controllerTemp',controllerTemp.toFixed(0));
+  setText('battery',Math.max(15,92-tripKm*.7).toFixed(0));
+
+  // GPS demo drift / heading
+  if(vehicleOn && direction!=='STOP' && !brake){
+    const step=speed*dt/111.32;
+    if(direction==='forward') gpsLat+=step;
+    if(direction==='reverse') gpsLat-=step;
+    if(direction==='left') {gpsLon-=step*.55;gpsHeading=(gpsHeading+4)%360}
+    if(direction==='right'){gpsLon+=step*.55;gpsHeading=(gpsHeading+4)%360}
+  }
+  setText('gpsLat',gpsLat.toFixed(6)); setText('gpsLon',gpsLon.toFixed(6));
+  setText('gpsAlt',Math.round(gpsAlt+(Math.random()-.5)*.4)+' m');
+  setText('gpsHeading',Math.round(gpsHeading)+'°');
+  setText('gpsSats',vehicleOn?Math.floor(10+Math.random()*5):12);
+  setText('gpsAccuracy','±'+(1.8+Math.random()*.8).toFixed(1)+' m');
+  setText('gpsUpdateAge',(0.3+Math.random()*.4).toFixed(1)+'s');
+  $('vehicleDot').style.left=(42+(gpsLon-75.9553)*900)+'%';
+  $('vehicleDot').style.top=(57-(gpsLat-30.5164)*900)+'%';
+
+  // IMU demo
+  const moving=vehicleOn&&!brake&&direction!=='STOP';
+  imuRoll=moving ? Math.sin(Date.now()/700)*3.5 : Math.sin(Date.now()/1400)*.3;
+  imuPitch=moving ? Math.cos(Date.now()/900)*2.8 : Math.cos(Date.now()/1600)*.2;
+  setText('imuAx',(moving?(Math.random()-.5)*1.2:0.02).toFixed(2));
+  setText('imuAy',(moving?(Math.random()-.5)*1.0:-0.01).toFixed(2));
+  setText('imuAz',(9.81+(Math.random()-.5)*.08).toFixed(2));
+  setText('imuRoll',imuRoll.toFixed(1)+'°'); setText('imuPitch',imuPitch.toFixed(1)+'°');
+
+  setText('avgSpeed',(12+speed*.35).toFixed(1));
+  setText('fleetDistance',(126.8+tripKm).toFixed(1));
+},500);
+
+// Laser distance sensor: demo fallback until a real VL53L1X/ToF sensor is connected.
+setInterval(()=>{
+  if(vehicleOn&&direction!=='STOP'&&!brake){
+    laser+=((Math.random()-.5)*.18);
+    laser=Math.max(.25,Math.min(4.0,laser));
+  }
+  setText('laserDistance',laser.toFixed(2));
+  const pct=Math.max(4,Math.min(100,laser/4*100));
+  $('laserBar').style.width=pct+'%';
+  let s=laser<.5?'● CRITICAL · OBSTACLE VERY CLOSE':laser<1?'● WARNING · REDUCE SPEED':'● SAFE · CLEAR PATH';
+  setText('laserStatus',s);
+  setText('mobLaser',laser<.5?'CRITICAL':laser<1?'WARNING':'SAFE');
+  $('mobLaser').className=laser<.5?'red':laser<1?'yellow':'green';
+},700);
+
+// Optional ESP32 JSON telemetry endpoint.
+// Expected JSON example:
+// {"lat":30.5164,"lon":75.9553,"alt":248,"speed":12.4,"heading":92,
+//  "laser":2.1,"ax":0.1,"ay":-0.2,"az":9.8,"roll":1.2,"pitch":-0.5}
+async function pollTelemetry(){
+  if(!wifiConnected) return;
+  try{
+    const ctl=new AbortController(); const timer=setTimeout(()=>ctl.abort(),1200);
+    const r=await fetch(ESP32_BASE_URL+'/telemetry',{cache:'no-store',signal:ctl.signal});
+    clearTimeout(timer); if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    if(d.lat!=null)setText('gpsLat',Number(d.lat).toFixed(6));
+    if(d.lon!=null)setText('gpsLon',Number(d.lon).toFixed(6));
+    if(d.alt!=null)setText('gpsAlt',Number(d.alt).toFixed(0)+' m');
+    if(d.heading!=null)setText('gpsHeading',Number(d.heading).toFixed(0)+'°');
+    if(d.speed!=null){speed=Number(d.speed);setText('speed',speed.toFixed(1))}
+    if(d.laser!=null)laser=Number(d.laser);
+    if(d.ax!=null)setText('imuAx',Number(d.ax).toFixed(2));
+    if(d.ay!=null)setText('imuAy',Number(d.ay).toFixed(2));
+    if(d.az!=null)setText('imuAz',Number(d.az).toFixed(2));
+    if(d.roll!=null)setText('imuRoll',Number(d.roll).toFixed(1)+'°');
+    if(d.pitch!=null)setText('imuPitch',Number(d.pitch).toFixed(1)+'°');
+  }catch(e){
+    // Keep demo values running if the ESP32 telemetry endpoint is not implemented.
+  }
+}
+setInterval(pollTelemetry,1000);
+
+log('MVCU-01 mining dashboard loaded');
+log('GPS + Laser Distance + IMU monitoring enabled');
+log('ESP32 telemetry endpoint: /telemetry (optional live JSON)');
+log('Laser, GPS and IMU currently use DEMO values until sensors are connected','warn');
+log('For production: connect GNSS + VL53L1X/ToF + 6/9-axis IMU to ESP32');
+updateLink();updateDrive();
+</script>
+</body>
+</html>
