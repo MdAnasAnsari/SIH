@@ -14,7 +14,7 @@ export const state = {
   gpsLon: 75.9553,
   gpsAlt: 248,
   gpsHeading: 0,
-  laser: 2.36,
+  laser: null,
   imuRoll: 0,
   imuPitch: 0,
 };
