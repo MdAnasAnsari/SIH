@@ -8,3 +8,145 @@ h1{font-size:24px;margin:0;letter-spacing:.04em}.subtitle{font-size:11px;color:v
 .layout{display:grid;grid-template-columns:320px minmax(420px,1fr) 340px;gap:14px}.bottom{display:grid;grid-template-columns:1.25fr 1fr .85fr;gap:14px;margin-top:14px}
 .panel{background:linear-gradient(180deg,rgba(14,34,53,.97),rgba(7,22,35,.97));border:1px solid var(--line);border-radius:var(--radius);padding:15px;box-shadow:var(--shadow)}
 .panelTitle{display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.08em;margin-bottom:13px}.panelTitle span:first-child{font-weight:700}.badge{font:700 10px var(--mono);padding:5px 8px;border-radius:999px;background:#12334b;color:var(--muted)}.badge.online{background:rgba(22,227,138,.1);color:var(--green)!important}
+/* =========================================================
+   MVCU-01 V2 PROFESSIONAL DASHBOARD
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% 0%, #092238 0%, transparent 42%),
+    #020b14;
+  color: #e8f7ff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app {
+  width: min(1600px, 96vw);
+  margin: auto;
+  padding: 14px 0 28px;
+}
+
+.panel,
+.header,
+.kpi,
+.statBlock {
+  background: linear-gradient(
+    145deg,
+    rgba(7, 26, 41, .97),
+    rgba(3, 16, 27, .97)
+  );
+
+  border: 1px solid rgba(0, 157, 255, .35);
+  box-shadow:
+    0 0 0 1px rgba(0, 157, 255, .04),
+    0 0 22px rgba(0, 120, 255, .08);
+
+  border-radius: 10px;
+}
+
+.panel {
+  padding: 12px;
+}
+
+.panelTitle {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  color: #dff5ff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.panelTitle > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.metric {
+  background: rgba(3, 17, 29, .75);
+  border: 1px solid rgba(48, 130, 170, .25);
+  border-radius: 7px;
+  padding: 10px;
+}
+
+.metric label,
+.statusCell label,
+.kpi label,
+.odoInfo label {
+  display: block;
+  color: #7194a9;
+  font-size: 9px;
+  letter-spacing: .8px;
+  margin-bottom: 5px;
+}
+
+.metric strong {
+  color: #f3fbff;
+  font-size: 18px;
+}
+
+.green {
+  color: #00e89b !important;
+}
+
+.cyan {
+  color: #00c8ff !important;
+}
+
+.red {
+  color: #ff5364 !important;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(500px, 1fr) 340px;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.layout > .controls {
+  grid-column: 1;
+}
+
+.layout > .camera {
+  grid-column: 2;
+}
+
+.layout > .telemetryPanel {
+  grid-column: 3;
+}
+
+.camera {
+  min-width: 0;
+}
+
+.cameraFrame {
+  height: 330px !important;
+  min-height: 330px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  background: #000;
+}
+
+.cameraFrame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cameraControls {
+  display: grid !important;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 8px;
+  margin-top: 9px;
+}
