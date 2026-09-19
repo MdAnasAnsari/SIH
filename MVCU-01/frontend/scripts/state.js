@@ -3,6 +3,7 @@ export const ESP32_BASE_URL = 'http://192.168.4.1';
 export const state = {
   wifiConnected: false,
   vehicleOn: false,
+  mode: 'MANUAL',
   direction: 'STOP',
   brake: false,
   pwm: 0,
