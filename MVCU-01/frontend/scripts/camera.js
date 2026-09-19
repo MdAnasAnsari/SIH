@@ -34,9 +34,19 @@ export function bindCamera() {
   $('btnCameraStart').onclick = startCamera;
   $('btnCameraStop').onclick = stopCamera;
   $('btnSetCamera').onclick = () => {
-    stopCamera();
-    log('Camera URL updated');
-  };
+  const url = $('cameraUrl').value.trim();
+
+  if (!url) {
+    log('Enter a valid camera URL', 'warn');
+    return;
+  }
+
+  stopCamera();
+
+  log('Camera URL updated: ' + url);
+
+  startCamera();
+};
   $('btnFullscreen').onclick = () => {
     const frame = $('cameraFrame');
     if (!document.fullscreenElement) frame.requestFullscreen?.();
