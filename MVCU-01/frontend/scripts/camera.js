@@ -6,10 +6,28 @@ function startCamera() {
     log('Enter phone camera stream URL', 'warn');
     return;
   }
-  $('cameraStream').src = url;
-  $('cameraStream').style.display = 'block';
-  $('cameraPlaceholder').style.display = 'none';
+const image = $('cameraStream');
+
+image.onerror = () => {
+  setText('cameraStatus', 'OFFLINE');
+  setText('cameraBadge', 'OFFLINE');
+  setText('cameraRec', '● CAMERA ERROR');
+  setText('mobCamera', 'OFFLINE');
+  $('mobCamera').className = 'red';
+  log('Camera stream unavailable: ' + url, 'err');
+};
+
+image.onload = () => {
   setText('cameraStatus', 'ONLINE');
+  setText('cameraBadge', 'ONLINE');
+  setText('cameraRec', '● CAMERA LIVE');
+  setText('mobCamera', 'ONLINE');
+  $('mobCamera').className = 'green';
+};
+
+image.src = url;
+image.style.display = 'block';
+$('cameraPlaceholder').style.display = 'none';
   setText('cameraBadge', 'ONLINE');
   setText('cameraRec', '● CAMERA LIVE');
   setText('mobCamera', 'ONLINE');
