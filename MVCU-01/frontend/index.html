@@ -49,7 +49,14 @@
       <div class="placeholder" id="cameraPlaceholder">CAMERA FEED<br><br>Enter your phone camera stream URL below<br>and press START CAMERA.</div>
       <div class="cameraOverlay"><span class="rec" id="cameraRec">● CAMERA OFF</span><span class="rec">MVCU-01</span></div>
     </div>
-    <div class="cameraInput"><input id="cameraUrl" value="http://192.168.4.20:8080/video" placeholder="http://PHONE-IP:PORT/video"><button class="btn small" id="btnSetCamera">SET</button></div>
+<div class="cameraInput">
+  <input
+    id="cameraUrl"
+    value="http://192.168.137.158:8080/video"
+    placeholder="http://PHONE-IP:PORT/video"
+  >
+  <button class="btn small" id="btnSetCamera">SET</button>
+</div>
     <div class="cameraControls"><button class="btn start" id="btnCameraStart">▶ START CAMERA</button><button class="btn off" id="btnCameraStop">■ STOP</button><button class="btn" id="btnFullscreen">⛶ FULL SCREEN</button></div>
   </section>
 
