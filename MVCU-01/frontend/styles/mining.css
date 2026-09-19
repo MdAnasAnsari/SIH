@@ -1,0 +1,39 @@
+/* ===== Mining telemetry upgrades ===== */
+.mineGrid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;margin-top:14px}
+.mapPanel{min-height:390px}
+.mineMap{height:320px;position:relative;overflow:hidden;border:1px solid #24577f;border-radius:10px;
+  background:
+    linear-gradient(25deg,transparent 0 48%,rgba(37,215,255,.09) 49% 50%,transparent 51%),
+    linear-gradient(155deg,transparent 0 58%,rgba(22,227,138,.07) 59% 60%,transparent 61%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px),
+    #06131f}
+.mineMap:before{content:"MINE SITE · ZONE A";position:absolute;left:14px;top:12px;color:#6d8fa8;font:10px var(--mono);letter-spacing:.12em}
+.road{position:absolute;height:22px;background:#142f42;border:1px dashed #2c617d;transform-origin:left center;opacity:.9}
+.road.r1{width:78%;left:8%;top:55%;transform:rotate(-12deg)}
+.road.r2{width:55%;left:29%;top:29%;transform:rotate(34deg)}
+.road.r3{width:47%;left:7%;top:77%;transform:rotate(5deg)}
+.zone{position:absolute;border:1px dashed rgba(255,194,26,.35);border-radius:50%;width:150px;height:95px;right:8%;top:10%}
+.vehicleDot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid white;box-shadow:0 0 16px rgba(22,227,138,.8);transform:translate(-50%,-50%);transition:.7s;z-index:3}
+.vehicleDot.selected{background:var(--cyan);box-shadow:0 0 18px rgba(37,215,255,.9)}
+.mapLegend{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;color:var(--muted);font:10px var(--mono)}
+.legendDot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--green)}
+.legendDot.warn{background:var(--yellow)}.legendDot.alert{background:var(--red)}
+.gpsCard{border-color:#1c6388;background:linear-gradient(180deg,#08243a,#071722)}
+.gpsCoords{font:700 18px var(--mono);color:var(--cyan);line-height:1.5}
+.gpsMeta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.gpsMeta div{border:1px solid #16476a;border-radius:8px;padding:8px;background:#061522}
+.gpsMeta label{display:block;color:var(--muted);font-size:9px}.gpsMeta b{font:12px var(--mono)}
+.imuCard{border-color:#275f50;background:linear-gradient(180deg,#09241e,#071722)}
+.imuAxes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.axis{padding:8px;border:1px solid #205846;border-radius:8px;background:#061a17;text-align:center}
+.axis label{display:block;color:var(--muted);font-size:9px}.axis b{font:15px var(--mono)}
+.attitude{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.alertPanel{max-height:390px}
+.alertFeed{height:320px;overflow:auto}
+.alertItem{padding:10px;border-left:3px solid var(--yellow);background:#0a1a28;border-radius:7px;margin-bottom:7px;font-size:10px}
+.alertItem.critical{border-left-color:var(--red)}.alertItem.ok{border-left-color:var(--green)}
+.alertItem b{display:block;font-size:11px;margin-bottom:3px}.alertItem span{color:var(--muted);font:9px var(--mono)}
+.kpiStrip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+.kpi{padding:12px;border:1px solid var(--line);border-radius:10px;background:#081a2b}
+.kpi label{display:block;color:var(--muted);font-size:9px}.kpi strong{display:block;font:700 21px var(--mono);margin-top:5px}.kpi small{color:var(--muted);font-size:9px}

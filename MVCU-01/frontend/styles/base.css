@@ -1,0 +1,10 @@
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -20%,#12314b 0,#07111c 48%,#040a10 100%);color:var(--text);font-family:var(--font);min-height:100vh;padding:16px}
+button,input{font:inherit}.app{max-width:1500px;margin:auto}
+.header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 18px;background:linear-gradient(135deg,#0d2134,#091522);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:14px}.brandIcon{width:48px;height:48px;border:2px solid var(--cyan);border-radius:12px;display:grid;place-items:center;font-size:25px;box-shadow:0 0 20px rgba(37,215,255,.15)}
+h1{font-size:24px;margin:0;letter-spacing:.04em}.subtitle{font-size:11px;color:var(--muted);letter-spacing:.13em;margin-top:3px}
+.headerStats{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:flex-end}.stat{font-family:var(--mono);font-size:11px;color:var(--muted)}.stat b{display:block;color:var(--text);font-size:13px;margin-top:4px}.online{color:var(--green)!important}.mode{display:flex;gap:4px;border:1px solid var(--line);padding:4px;border-radius:9px}.mode button{border:0;background:transparent;color:var(--muted);padding:8px 13px;border-radius:6px;cursor:pointer}.mode button.active{background:var(--blue);color:white}
+.layout{display:grid;grid-template-columns:320px minmax(420px,1fr) 340px;gap:14px}.bottom{display:grid;grid-template-columns:1.25fr 1fr .85fr;gap:14px;margin-top:14px}
+.panel{background:linear-gradient(180deg,rgba(14,34,53,.97),rgba(7,22,35,.97));border:1px solid var(--line);border-radius:var(--radius);padding:15px;box-shadow:var(--shadow)}
+.panelTitle{display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.08em;margin-bottom:13px}.panelTitle span:first-child{font-weight:700}.badge{font:700 10px var(--mono);padding:5px 8px;border-radius:999px;background:#12334b;color:var(--muted)}.badge.online{background:rgba(22,227,138,.1);color:var(--green)!important}

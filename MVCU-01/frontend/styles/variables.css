@@ -1,0 +1,7 @@
+:root{
+  --bg:#07111c; --panel:#0b1a2a; --panel2:#0e2235; --line:#17466d;
+  --blue:#168cff; --cyan:#25d7ff; --green:#16e38a; --yellow:#ffc21a;
+  --red:#ff3f52; --orange:#ff9f1c; --text:#eef7ff; --muted:#8da7bd;
+  --shadow:0 18px 45px rgba(0,0,0,.35); --radius:14px;
+  --font:Inter,Segoe UI,Arial,sans-serif; --mono:Consolas,ui-monospace,monospace;
+}
