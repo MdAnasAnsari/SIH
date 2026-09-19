@@ -16,17 +16,54 @@
 <body>
 <div class="app">
 <header class="header">
-  <div class="brand"><div class="brandIcon">🚗</div><div><h1>MVCU-01</h1><div class="subtitle">MINING VEHICLE CONTROL UNIT · REAL-TIME FLEET & SAFETY MONITORING</div></div></div>
+  <div class="brand">
+    <div class="brandIcon">⛰</div>
+
+    <div>
+      <h1>MVCU-01</h1>
+      <div class="subtitle">
+        MINING VEHICLE CONTROL UNIT · REAL-TIME FLEET & SAFETY MONITORING
+      </div>
+    </div>
+  </div>
+
   <div class="headerStats">
-    <div class="stat">WI-FI<b id="wifiStatus" class="online">OFFLINE</b></div>
-    <div class="stat">CONTROLLER<b id="controllerStatus">OFFLINE</b></div>
-    <div class="stat">CAMERA<b id="cameraStatus">OFFLINE</b></div>
+
+    <div class="statBlock">
+      <span>WI-FI</span>
+      <b id="wifiStatus" class="online">OFFLINE</b>
+      <small>192.168.4.1</small>
+    </div>
+
+    <div class="statBlock">
+      <span>CONTROLLER</span>
+      <b id="controllerStatus">OFFLINE</b>
+      <small>ESP32</small>
+    </div>
+
+    <div class="statBlock">
+      <span>CAMERA</span>
+      <b id="cameraStatus">OFFLINE</b>
+      <small>LIVE</small>
+    </div>
+
+    <div class="statBlock">
+      <span>GPS</span>
+      <b id="gpsSats">-- SAT</b>
+      <small id="gpsBadge">NO FIX</small>
+    </div>
+
     <div class="mode" id="driveMode">
-  <button class="active" data-mode="MANUAL">MANUAL</button>
-  <button data-mode="AUTO">AUTO</button>
-  <button data-mode="ASSIST">ASSIST</button>
-</div>
-    <div class="stat">SYSTEM<b id="systemStatus" class="online">STANDBY</b></div>
+      <button class="active" data-mode="MANUAL">MANUAL</button>
+      <button data-mode="AUTO">AUTO</button>
+      <button data-mode="ASSIST">ASSIST</button>
+    </div>
+
+    <div class="clockBlock">
+      <small>SYSTEM</small>
+      <b id="systemStatus">STANDBY</b>
+    </div>
+
   </div>
 </header>
 
@@ -65,24 +102,53 @@
 
 </div>
   </section>
+<section class="panel camera">
+  <div class="panelTitle">
+    <span>📷 LIVE CAMERA FEED</span>
+    <span class="badge" id="cameraBadge">OFFLINE</span>
+  </div>
 
-  <section class="panel camera">
-    <div class="panelTitle"><span>📷 LIVE CAMERA · PHONE</span><span class="badge" id="cameraBadge">OFFLINE</span></div>
-    <div class="cameraFrame" id="cameraFrame">
-      <img id="cameraStream" alt="Phone camera live stream">
-      <div class="placeholder" id="cameraPlaceholder">CAMERA FEED<br><br>Enter your phone camera stream URL below<br>and press START CAMERA.</div>
-      <div class="cameraOverlay"><span class="rec" id="cameraRec">● CAMERA OFF</span><span class="rec">MVCU-01</span></div>
+  <div class="cameraFrame" id="cameraFrame">
+
+    <img id="cameraStream" alt="Phone camera live stream">
+
+    <div class="placeholder" id="cameraPlaceholder">
+      CAMERA FEED<br><br>
+      Enter your phone camera stream URL below
+      and press START CAMERA.
     </div>
-    <div class="cameraInput">
-  <input
-    id="cameraUrl"
-    value="http://192.168.137.158:8080/video"
-    placeholder="http://PHONE-IP:PORT/video"
-  >
-  <button class="btn small" id="btnSetCamera">SET</button>
-</div>
-    <div class="cameraControls"><button class="btn start" id="btnCameraStart">▶ START CAMERA</button><button class="btn off" id="btnCameraStop">■ STOP</button><button class="btn" id="btnFullscreen">⛶ FULL SCREEN</button></div>
-  </section>
+
+    <div class="cameraOverlay">
+      <span class="rec" id="cameraRec">● CAMERA OFF</span>
+      <span class="rec">MVCU-01</span>
+    </div>
+
+  </div>
+
+  <div class="cameraInput">
+    <input
+      id="cameraUrl"
+      value="http://192.168.137.158:8080/video"
+      placeholder="http://PHONE-IP:PORT/video"
+    >
+    <button class="btn small" id="btnSetCamera">SET</button>
+  </div>
+
+  <div class="cameraControls">
+    <button class="btn start" id="btnCameraStart">
+      ▶ START CAMERA
+    </button>
+
+    <button class="btn off" id="btnCameraStop">
+      ■ STOP
+    </button>
+
+    <button class="btn" id="btnFullscreen">
+      ⛶ FULL SCREEN
+    </button>
+  </div>
+</section>
+ 
 
   <section class="panel telemetryPanel">
     <div class="panelTitle"><span>📊 TELEMETRY</span><span class="badge online">LIVE DATA</span></div>
