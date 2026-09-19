@@ -253,3 +253,35 @@
   }
 
 }
+.alertPanel {
+  margin-top: 10px !important;
+}
+
+.alertFeed {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.alertItem {
+  padding: 10px 12px;
+  margin-bottom: 6px;
+
+  border-radius: 6px;
+  background: rgba(5, 21, 34, .8);
+
+  border-left: 3px solid #00d99a;
+}
+
+.alertItem.critical {
+  border-left-color: #ff4057;
+}
+
+.alertItem b {
+  font-size: 10px;
+}
+
+.alertItem span {
+  float: right;
+  color: #5f8497;
+  font-size: 8px;
+}
